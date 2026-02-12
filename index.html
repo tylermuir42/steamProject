@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Steam Playtime — Team Project</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>Steam Playtime</h1>
+      <p class="tagline">See how long you’ve spent in your games</p>
+      <div id="auth-area">
+        <a id="login-btn" class="btn btn-primary" href="#">Sign in with Steam</a>
+        <div id="user-area" class="user-area hidden">
+          <span id="user-name"></span>
+          <button id="logout-btn" class="btn btn-ghost">Sign out</button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <section id="welcome" class="card">
+        <p>Sign in with Steam to view your library and playtime for each game. Average “time to beat” data can be added later.</p>
+      </section>
+
+      <section id="loading" class="card hidden">
+        <p class="loading-text">Loading your games…</p>
+      </section>
+
+      <section id="games-section" class="hidden">
+        <h2>Your games</h2>
+        <div id="games-list" class="games-list"></div>
+      </section>
+
+      <section id="error" class="card error hidden">
+        <p id="error-message"></p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Uses Steam Web API. Not affiliated with Valve.</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
