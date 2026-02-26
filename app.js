@@ -91,11 +91,13 @@
     const CONCURRENCY = 4;
     const delay = (ms) => new Promise((r) => setTimeout(r, ms));
     let hltbWarned = false;
+    let hltbUnavailable = false;
 
-    for (let i = 0; i < games.length; i += CONCURRENCY) {
+    for (let i = 0; i < games.length && !hltbUnavailable; i += CONCURRENCY) {
       const chunk = games.slice(i, i + CONCURRENCY);
       await Promise.all(
         chunk.map(async (g) => {
+          if (hltbUnavailable) return;
           const name = g.name || 'Unknown';
           const appid = g.appid != null ? String(g.appid) : '';
           try {
@@ -106,9 +108,10 @@
             const row = els.gamesList.querySelector(`[data-appid="${appid}"]`);
             const span = row?.querySelector('.game-avg-placeholder');
             if (!span) return;
-            if (!res.ok) {
+            if (!res.ok || data.error) {
+              hltbUnavailable = true;
               if (!hltbWarned) {
-                console.warn('How Long to Beat lookups failed (function may be misconfigured). Check Netlify Functions and deploy logs.');
+                console.warn('How Long to Beat is temporarily unavailable (site changed their API). Time-to-beat column will show —.');
                 hltbWarned = true;
               }
               span.textContent = 'Avg. time to beat: —';
@@ -121,6 +124,7 @@
               span.textContent = 'Avg. time to beat: —';
             }
           } catch (_) {
+            hltbUnavailable = true;
             if (!hltbWarned) {
               console.warn('How Long to Beat lookups failed (network or function). Check the Network tab for /.netlify/functions/hltb-search.');
               hltbWarned = true;
@@ -131,7 +135,7 @@
           }
         })
       );
-      if (i + CONCURRENCY < games.length) await delay(200);
+      if (i + CONCURRENCY < games.length && !hltbUnavailable) await delay(200);
     }
   }
 

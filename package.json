@@ -4,6 +4,6 @@
   "description": "Steam library playtime with How Long to Beat",
   "private": true,
   "dependencies": {
-    "howlongtobeat": "^1.8.0"
+    "howlongtobeat": "github:Jan540/howlongtobeat"
   }
 }
