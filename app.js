@@ -10,6 +10,7 @@
     loading: document.getElementById('loading'),
     gamesSection: document.getElementById('games-section'),
     gamesList: document.getElementById('games-list'),
+    totalPlaytime: document.getElementById('total-playtime'),
     error: document.getElementById('error'),
     errorMessage: document.getElementById('error-message'),
   };
@@ -100,9 +101,13 @@
 
       if (games.length === 0) {
         show(els.gamesSection);
+        els.totalPlaytime.textContent = '';
         els.gamesList.innerHTML = '<p class="card">No games in your library (or profile is private).</p>';
         return;
       }
+
+      const totalMinutes = games.reduce((sum, g) => sum + (g.playtime_forever || 0), 0);
+      els.totalPlaytime.textContent = `Total playtime: ${formatMinutes(totalMinutes)}`;
 
       els.gamesList.innerHTML = games
         .sort((a, b) => (b.playtime_forever || 0) - (a.playtime_forever || 0))
