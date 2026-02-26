@@ -81,6 +81,47 @@
     return m ? `${h}h ${m}m` : `${h}h`;
   }
 
+  function formatHltbHours(hours) {
+    if (hours == null || hours <= 0) return null;
+    if (hours >= 100) return Math.round(hours) + 'h';
+    return hours % 1 === 0 ? hours + 'h' : hours.toFixed(1) + 'h';
+  }
+
+  async function loadHltbForGames(games) {
+    const CONCURRENCY = 4;
+    const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+
+    for (let i = 0; i < games.length; i += CONCURRENCY) {
+      const chunk = games.slice(i, i + CONCURRENCY);
+      await Promise.all(
+        chunk.map(async (g) => {
+          const name = g.name || 'Unknown';
+          const appid = g.appid != null ? String(g.appid) : '';
+          try {
+            const res = await fetch(
+              `${API_BASE}/hltb-search?name=${encodeURIComponent(name)}`
+            );
+            const data = await res.json();
+            const row = els.gamesList.querySelector(`[data-appid="${appid}"]`);
+            const span = row?.querySelector('.game-avg-placeholder');
+            if (!span) return;
+            if (data.found && data.main != null) {
+              const mainStr = formatHltbHours(data.main);
+              span.textContent = mainStr ? `Avg. time to beat: ${mainStr}` : 'Avg. time to beat: —';
+            } else {
+              span.textContent = 'Avg. time to beat: —';
+            }
+          } catch (_) {
+            const row = els.gamesList.querySelector(`[data-appid="${appid}"]`);
+            const span = row?.querySelector('.game-avg-placeholder');
+            if (span) span.textContent = 'Avg. time to beat: —';
+          }
+        })
+      );
+      if (i + CONCURRENCY < games.length) await delay(200);
+    }
+  }
+
   async function loadGames(steamId) {
     hide(els.welcome);
     hide(els.error);
@@ -109,13 +150,14 @@
       const totalMinutes = games.reduce((sum, g) => sum + (g.playtime_forever || 0), 0);
       els.totalPlaytime.textContent = `Total playtime: ${formatMinutes(totalMinutes)}`;
 
-      els.gamesList.innerHTML = games
-        .sort((a, b) => (b.playtime_forever || 0) - (a.playtime_forever || 0))
+      const sortedGames = games.slice().sort((a, b) => (b.playtime_forever || 0) - (a.playtime_forever || 0));
+      els.gamesList.innerHTML = sortedGames
         .map(function (g) {
           const playtime = formatMinutes(g.playtime_forever || 0);
           const name = g.name || 'Unknown';
+          const appid = g.appid != null ? String(g.appid) : '';
           return (
-            '<div class="game-row">' +
+            '<div class="game-row" data-appid="' + escapeHtml(appid) + '">' +
             `<span class="game-name">${escapeHtml(name)}</span>` +
             `<span class="game-playtime">${escapeHtml(playtime)}</span>` +
             '<span class="game-avg-placeholder">Avg. time to beat: —</span>' +
@@ -124,6 +166,8 @@
         })
         .join('');
       show(els.gamesSection);
+
+      loadHltbForGames(sortedGames);
     } catch (err) {
       showError('Network error. Check the console.');
       console.error(err);

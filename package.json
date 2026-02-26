@@ -1,0 +1,9 @@
+{
+  "name": "steam-playtime",
+  "version": "1.0.0",
+  "description": "Steam library playtime with How Long to Beat",
+  "private": true,
+  "dependencies": {
+    "howlongtobeat": "^1.8.0"
+  }
+}
