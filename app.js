@@ -90,6 +90,7 @@
   async function loadHltbForGames(games) {
     const CONCURRENCY = 4;
     const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+    let hltbWarned = false;
 
     for (let i = 0; i < games.length; i += CONCURRENCY) {
       const chunk = games.slice(i, i + CONCURRENCY);
@@ -105,6 +106,14 @@
             const row = els.gamesList.querySelector(`[data-appid="${appid}"]`);
             const span = row?.querySelector('.game-avg-placeholder');
             if (!span) return;
+            if (!res.ok) {
+              if (!hltbWarned) {
+                console.warn('How Long to Beat lookups failed (function may be misconfigured). Check Netlify Functions and deploy logs.');
+                hltbWarned = true;
+              }
+              span.textContent = 'Avg. time to beat: —';
+              return;
+            }
             if (data.found && data.main != null) {
               const mainStr = formatHltbHours(data.main);
               span.textContent = mainStr ? `Avg. time to beat: ${mainStr}` : 'Avg. time to beat: —';
@@ -112,6 +121,10 @@
               span.textContent = 'Avg. time to beat: —';
             }
           } catch (_) {
+            if (!hltbWarned) {
+              console.warn('How Long to Beat lookups failed (network or function). Check the Network tab for /.netlify/functions/hltb-search.');
+              hltbWarned = true;
+            }
             const row = els.gamesList.querySelector(`[data-appid="${appid}"]`);
             const span = row?.querySelector('.game-avg-placeholder');
             if (span) span.textContent = 'Avg. time to beat: —';
