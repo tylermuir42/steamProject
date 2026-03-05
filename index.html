@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <a href="#main" class="skip-link">Skip to main content</a>
   <div class="app">
     <header class="header">
       <h1>Steam Playtime</h1>
@@ -20,30 +21,30 @@
       </div>
     </header>
 
-    <main id="main">
-      <section id="welcome" class="card">
-        <p>Sign in with Steam to view your library and playtime for each game. Average “time to beat” data will be added later.</p>
+    <main id="main" tabindex="-1">
+      <section id="welcome" class="card" aria-label="Welcome">
+        <p class="text-muted">Sign in with Steam to view your library and playtime for each game. Average “time to beat” data will be added later.</p>
       </section>
 
-      <section id="loading" class="card hidden">
-        <p class="loading-text">Loading your games…</p>
+      <section id="loading" class="card hidden" aria-label="Loading">
+        <p class="loading-text text-muted">Loading your games…</p>
       </section>
 
-      <section id="games-section" class="hidden">
+      <section id="games-section" class="hidden" aria-label="Your games">
         <div class="games-summary">
           <h2>Your games</h2>
-          <p id="total-playtime" class="total-playtime" aria-live="polite"></p>
+          <p id="total-playtime" class="total-playtime text-muted" aria-live="polite"></p>
         </div>
-        <div id="games-list" class="games-list"></div>
+        <ul id="games-list" class="games-list" aria-label="Your games"></ul>
       </section>
 
-      <section id="error" class="card error hidden">
-        <p id="error-message"></p>
+      <section id="error" class="card error hidden" aria-label="Error">
+        <p id="error-message" class="error-message"></p>
       </section>
     </main>
 
-    <footer class="footer">
-      <p>Uses Steam Web API. Not affiliated with Valve.</p>
+    <footer class="footer" role="contentinfo">
+      <p class="text-muted">Uses Steam Web API. Not affiliated with Valve.</p>
     </footer>
   </div>
 

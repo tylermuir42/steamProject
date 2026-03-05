@@ -160,7 +160,7 @@
       if (games.length === 0) {
         show(els.gamesSection);
         els.totalPlaytime.textContent = '';
-        els.gamesList.innerHTML = '<p class="card">No games in your library (or profile is private).</p>';
+        els.gamesList.innerHTML = '<li class="card empty-state">No games in your library (or profile is private).</li>';
         return;
       }
 
@@ -174,11 +174,11 @@
           const name = g.name || 'Unknown';
           const appid = g.appid != null ? String(g.appid) : '';
           return (
-            '<div class="game-row" data-appid="' + escapeHtml(appid) + '">' +
+            '<li class="game-row" data-appid="' + escapeHtml(appid) + '">' +
             `<span class="game-name">${escapeHtml(name)}</span>` +
             `<span class="game-playtime">${escapeHtml(playtime)}</span>` +
             '<span class="game-avg-placeholder">Avg. time to beat: —</span>' +
-            '</div>'
+            '</li>'
           );
         })
         .join('');
