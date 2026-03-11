@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game details — Steam Playtime</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to main content</a>
+  <div class="app">
+    <header class="header">
+      <h1>Steam Playtime</h1>
+      <p class="tagline">Game details</p>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <section id="details" class="card" aria-label="Game details">
+        <button id="back-btn" class="btn btn-ghost">&larr; Back to your games</button>
+
+        <div id="details-loading" class="details-loading text-muted">
+          Loading game details…
+        </div>
+
+        <section id="details-error" class="card error hidden" aria-label="Error">
+          <p id="details-error-message" class="error-message"></p>
+        </section>
+
+        <div id="details-content" class="details-content hidden" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <footer class="footer" role="contentinfo">
+      <p class="text-muted">Uses Steam Storefront data. Not affiliated with Valve.</p>
+    </footer>
+  </div>
+
+  <script src="details.js"></script>
+</body>
+</html>
+

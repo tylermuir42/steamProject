@@ -5,5 +5,3 @@
 
 [functions]
   node_bundler = "esbuild"
-  # howlongtobeat and its deps don't bundle well with esbuild; ship them as-is
-  external_node_modules = ["howlongtobeat"]

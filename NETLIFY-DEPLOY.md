@@ -106,22 +106,9 @@ You can run the site and functions on your machine before deploying:
 
 ---
 
-## 8. How Long to Beat (implemented)
+## 8. Time-to-beat data
 
-The app shows **“Avg. time to beat”** for each game using the [howlongtobeat](https://github.com/ckatzorke/howlongtobeat) npm package. No API key is required; the library fetches data from [howlongtobeat.com](https://howlongtobeat.com/) on the server so the browser never talks to HLTB directly (avoids CORS).
-
-**What’s in place:**
-
-1. **`package.json`** – Declares the `howlongtobeat` dependency. Netlify runs `npm install` at build time so the function can use it.
-2. **`netlify/functions/hltb-search.js`** – A Netlify Function that:
-   - Accepts a game name via GET: `/.netlify/functions/hltb-search?name=Game+Name`
-   - Uses `HowLongToBeatService().search(name)` and returns the best match’s **Main Story** time (in hours).
-   - Returns JSON: `{ found: true, name: "...", main: 34.5 }` or `{ found: false }`.
-3. **`app.js`** – After loading your Steam games, calls `hltb-search` for each game (with limited concurrency), then replaces “Avg. time to beat: —” with the value (e.g. “35h”) when found.
-
-**To run locally:** From the project root run `npm install`, then `netlify dev`. The function will use the same dependency.
-
-**Optional:** The function also returns `mainExtra` and `completionist` (Main + Extras and Completionist times). You can extend the UI to show those if you like.
+This project no longer integrates external “time to beat” data. The UI only shows your total playtime per game.
 
 ---
 
@@ -132,6 +119,5 @@ The app shows **“Avg. time to beat”** for each game using the [howlongtobeat
 - [ ] `STEAM_API_KEY` set in Netlify **Environment variables**.
 - [ ] Site redeployed after adding the env var.
 - [ ] Steam key domain updated to your Netlify URL for production.
-- [ ] `npm install` run (so Netlify can bundle the `howlongtobeat` dependency for the HLTB function).
 
 If something doesn’t work, check the **Functions** tab in Netlify for errors and the browser console for failed requests to `/.netlify/functions/...`.

@@ -81,64 +81,6 @@
     return m ? `${h}h ${m}m` : `${h}h`;
   }
 
-  function formatHltbHours(hours) {
-    if (hours == null || hours <= 0) return null;
-    if (hours >= 100) return Math.round(hours) + 'h';
-    return hours % 1 === 0 ? hours + 'h' : hours.toFixed(1) + 'h';
-  }
-
-  async function loadHltbForGames(games) {
-    const CONCURRENCY = 4;
-    const delay = (ms) => new Promise((r) => setTimeout(r, ms));
-    let hltbWarned = false;
-    let hltbUnavailable = false;
-
-    for (let i = 0; i < games.length && !hltbUnavailable; i += CONCURRENCY) {
-      const chunk = games.slice(i, i + CONCURRENCY);
-      await Promise.all(
-        chunk.map(async (g) => {
-          if (hltbUnavailable) return;
-          const name = g.name || 'Unknown';
-          const appid = g.appid != null ? String(g.appid) : '';
-          try {
-            const res = await fetch(
-              `${API_BASE}/hltb-search?name=${encodeURIComponent(name)}`
-            );
-            const data = await res.json();
-            const row = els.gamesList.querySelector(`[data-appid="${appid}"]`);
-            const span = row?.querySelector('.game-avg-placeholder');
-            if (!span) return;
-            if (!res.ok || data.error) {
-              hltbUnavailable = true;
-              if (!hltbWarned) {
-                console.warn('How Long to Beat is temporarily unavailable (site changed their API). Time-to-beat column will show —.');
-                hltbWarned = true;
-              }
-              span.textContent = 'Avg. time to beat: —';
-              return;
-            }
-            if (data.found && data.main != null) {
-              const mainStr = formatHltbHours(data.main);
-              span.textContent = mainStr ? `Avg. time to beat: ${mainStr}` : 'Avg. time to beat: —';
-            } else {
-              span.textContent = 'Avg. time to beat: —';
-            }
-          } catch (_) {
-            hltbUnavailable = true;
-            if (!hltbWarned) {
-              console.warn('How Long to Beat lookups failed (network or function). Check the Network tab for /.netlify/functions/hltb-search.');
-              hltbWarned = true;
-            }
-            const row = els.gamesList.querySelector(`[data-appid="${appid}"]`);
-            const span = row?.querySelector('.game-avg-placeholder');
-            if (span) span.textContent = 'Avg. time to beat: —';
-          }
-        })
-      );
-      if (i + CONCURRENCY < games.length && !hltbUnavailable) await delay(200);
-    }
-  }
-
   async function loadGames(steamId) {
     hide(els.welcome);
     hide(els.error);
@@ -174,17 +116,14 @@
           const name = g.name || 'Unknown';
           const appid = g.appid != null ? String(g.appid) : '';
           return (
-            '<li class="game-row" data-appid="' + escapeHtml(appid) + '">' +
+            '<li class="game-row" data-appid="' + escapeHtml(appid) + '" tabindex="0">' +
             `<span class="game-name">${escapeHtml(name)}</span>` +
             `<span class="game-playtime">${escapeHtml(playtime)}</span>` +
-            '<span class="game-avg-placeholder">Avg. time to beat: —</span>' +
             '</li>'
           );
         })
         .join('');
       show(els.gamesSection);
-
-      loadHltbForGames(sortedGames);
     } catch (err) {
       showError('Network error. Check the console.');
       console.error(err);
@@ -196,6 +135,26 @@
     div.textContent = s;
     return div.innerHTML;
   }
+
+  function handleGameRowActivate(row) {
+    const appid = row?.getAttribute('data-appid');
+    if (!appid) return;
+    window.location.href = `details.html?appid=${encodeURIComponent(appid)}`;
+  }
+
+  els.gamesList.addEventListener('click', function (event) {
+    const row = event.target.closest('.game-row');
+    if (!row) return;
+    handleGameRowActivate(row);
+  });
+
+  els.gamesList.addEventListener('keydown', function (event) {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const row = event.target.closest('.game-row');
+    if (!row) return;
+    event.preventDefault();
+    handleGameRowActivate(row);
+  });
 
   els.logoutBtn.addEventListener('click', function () {
     setSteamId(null);
