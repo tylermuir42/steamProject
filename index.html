@@ -35,6 +35,78 @@
           <h2>Your games</h2>
           <p id="total-playtime" class="total-playtime text-muted" aria-live="polite"></p>
         </div>
+        <details id="filters" class="filters">
+          <summary class="filters-summary">Filter your games</summary>
+          <form id="filters-form" class="filters-form" novalidate>
+            <fieldset class="field-group">
+              <legend class="field-legend">Play status</legend>
+              <div class="field-row">
+                <input
+                  type="radio"
+                  id="status-all"
+                  name="playStatus"
+                  value="all"
+                  checked
+                />
+                <label for="status-all">All games</label>
+              </div>
+              <div class="field-row">
+                <input
+                  type="radio"
+                  id="status-played"
+                  name="playStatus"
+                  value="played"
+                />
+                <label for="status-played">Played only (more than 0 hours)</label>
+              </div>
+              <div class="field-row">
+                <input
+                  type="radio"
+                  id="status-unplayed"
+                  name="playStatus"
+                  value="unplayed"
+                />
+                <label for="status-unplayed">Unplayed only (0 hours)</label>
+              </div>
+            </fieldset>
+
+            <fieldset class="field-group">
+              <legend class="field-legend">Minimum hours played</legend>
+              <label for="min-hours" class="field-label">
+                Show games with at least this many hours
+              </label>
+              <div class="field-row">
+                <input
+                  type="number"
+                  id="min-hours"
+                  name="minHours"
+                  min="0"
+                  max="10000"
+                  step="0.5"
+                  inputmode="decimal"
+                  aria-describedby="min-hours-help"
+                />
+                <span class="field-suffix">hours</span>
+              </div>
+              <p id="min-hours-help" class="field-help text-muted">
+                Leave blank to ignore this filter.
+              </p>
+            </fieldset>
+
+            <p
+              id="filters-error"
+              class="form-error text-muted"
+              aria-live="polite"
+            ></p>
+
+            <div class="filters-actions">
+              <button type="submit" class="btn btn-primary">Apply filters</button>
+              <button type="button" id="filters-reset" class="btn btn-ghost">
+                Reset
+              </button>
+            </div>
+          </form>
+        </details>
         <ul id="games-list" class="games-list" aria-label="Your games"></ul>
       </section>
 
@@ -48,6 +120,6 @@
     </footer>
   </div>
 
-  <script src="app.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>

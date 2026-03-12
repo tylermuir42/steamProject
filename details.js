@@ -1,64 +1,52 @@
-(function () {
-  const API_BASE = '/.netlify/functions';
+import { show, hide, escapeHtml } from './utils.js';
 
-  const els = {
-    loading: document.getElementById('details-loading'),
-    error: document.getElementById('details-error'),
-    errorMessage: document.getElementById('details-error-message'),
-    content: document.getElementById('details-content'),
-    backBtn: document.getElementById('back-btn'),
-  };
+const API_BASE = '/.netlify/functions';
 
-  function show(el) {
-    el.classList.remove('hidden');
-  }
-  function hide(el) {
-    el.classList.add('hidden');
-  }
+const els = {
+  loading: document.getElementById('details-loading'),
+  error: document.getElementById('details-error'),
+  errorMessage: document.getElementById('details-error-message'),
+  content: document.getElementById('details-content'),
+  backBtn: document.getElementById('back-btn'),
+};
 
-  function escapeHtml(s) {
-    const div = document.createElement('div');
-    div.textContent = s;
-    return div.innerHTML;
-  }
+function getAppIdFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('appid');
+}
 
-  function getAppIdFromUrl() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('appid');
-  }
+function goBack() {
+  window.location.href = 'index.html';
+}
 
-  function goBack() {
-    window.location.href = 'index.html';
-  }
+async function loadDetails(appid) {
+  hide(els.error);
+  show(els.loading);
+  hide(els.content);
 
-  async function loadDetails(appid) {
-    hide(els.error);
-    show(els.loading);
-    hide(els.content);
+  try {
+    const res = await fetch(
+      `${API_BASE}/steam-game-details?appid=${encodeURIComponent(appid)}`
+    );
+    const data = await res.json();
 
-    try {
-      const res = await fetch(
-        `${API_BASE}/steam-game-details?appid=${encodeURIComponent(appid)}`
-      );
-      const data = await res.json();
+    if (!res.ok) {
+      els.errorMessage.textContent = data.error || 'Failed to load game details.';
+      hide(els.loading);
+      show(els.error);
+      return;
+    }
 
-      if (!res.ok) {
-        els.errorMessage.textContent = data.error || 'Failed to load game details.';
-        hide(els.loading);
-        show(els.error);
-        return;
-      }
+    const name = data.name || 'Unknown game';
+    const header = data.headerImage;
+    const shortDesc = data.shortDescription || 'No description available.';
+    const release = data.releaseDate || 'Unknown release date';
+    const genres = (data.genres || []).join(', ');
+    const devs = (data.developers || []).join(', ');
+    const pubs = (data.publishers || []).join(', ');
+    const steamUrl = data.steamUrl;
 
-      const name = data.name || 'Unknown game';
-      const header = data.headerImage;
-      const shortDesc = data.shortDescription || 'No description available.';
-      const release = data.releaseDate || 'Unknown release date';
-      const genres = (data.genres || []).join(', ');
-      const devs = (data.developers || []).join(', ');
-      const pubs = (data.publishers || []).join(', ');
-      const steamUrl = data.steamUrl;
-
-      const html = `
+    const html = `
         <article class="details-layout">
           ${
             header
@@ -93,7 +81,7 @@
                 steamUrl
                   ? `<a href="${escapeHtml(
                       steamUrl
-                    )}" class="btn btn-primary" target="_blank" rel="noreferrer">View on Steam</a>`
+                  )}" class="btn btn-primary" target="_blank" rel="noreferrer">View on Steam</a>`
                   : ''
               }
             </div>
@@ -101,30 +89,29 @@
         </article>
       `;
 
-      els.content.innerHTML = html;
-      hide(els.loading);
-      show(els.content);
-    } catch (err) {
-      console.error(err);
-      els.errorMessage.textContent = 'Network error while loading game details.';
-      hide(els.loading);
-      show(els.error);
-    }
-  }
-
-  els.backBtn.addEventListener('click', goBack);
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') goBack();
-  });
-
-  const appid = getAppIdFromUrl();
-  if (!appid) {
-    els.errorMessage.textContent = 'No game specified.';
+    els.content.innerHTML = html;
+    hide(els.loading);
+    show(els.content);
+  } catch (err) {
+    console.error(err);
+    els.errorMessage.textContent = 'Network error while loading game details.';
     hide(els.loading);
     show(els.error);
-  } else {
-    loadDetails(appid);
   }
-})();
+}
+
+els.backBtn.addEventListener('click', goBack);
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') goBack();
+});
+
+const appid = getAppIdFromUrl();
+if (!appid) {
+  els.errorMessage.textContent = 'No game specified.';
+  hide(els.loading);
+  show(els.error);
+} else {
+  loadDetails(appid);
+}
 

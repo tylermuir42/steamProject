@@ -151,6 +151,110 @@ a:focus-visible {
   margin-bottom: 1rem;
 }
 
+.filters {
+  margin-bottom: 1rem;
+}
+
+.filters-summary {
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--accent);
+  list-style: none;
+  outline: none;
+}
+
+.filters-summary::-webkit-details-marker {
+  display: none;
+}
+
+.filters-summary::before {
+  content: "▸";
+  display: inline-block;
+  margin-right: 0.35rem;
+  transition: transform 0.15s ease-out;
+}
+
+.filters[open] .filters-summary::before {
+  transform: rotate(90deg);
+}
+
+.filters-form {
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: #111822;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.field-group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.field-legend {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.field-label {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+  color: var(--text-muted);
+}
+
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.field-row input[type="number"] {
+  max-width: 120px;
+}
+
+.field-suffix {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.field-help {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+}
+
+.form-error {
+  min-height: 1.25em;
+  font-size: 0.85rem;
+  color: var(--error-text);
+}
+
+.filters-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+@keyframes filtersDropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.filters[open] .filters-form {
+  animation: filtersDropdownFadeIn 0.25s ease-out;
+}
+
 .text-muted {
   color: var(--text-muted);
 }
@@ -214,10 +318,6 @@ a:focus-visible {
 .game-playtime {
   color: var(--accent);
   font-variant-numeric: tabular-nums;
-}
-
-.loading-text {
-  /* uses .text-muted */
 }
 
 .error {
@@ -309,6 +409,10 @@ a:focus-visible {
 
 /* --- Responsive --- */
 @media (max-width: 600px) {
+  .filters-form {
+    padding: 0.75rem;
+  }
+
   .game-row {
     grid-template-columns: 1fr;
     gap: 0.25rem;
